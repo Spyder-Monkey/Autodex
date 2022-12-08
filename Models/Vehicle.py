@@ -16,6 +16,7 @@ from typing import List
 import json
 
 import Models.Engine as Engine
+import Models.Recall as Recall
 
 class Vehicle():
     def __init__(self, vin:str, color:str, miles:int=0):
@@ -39,6 +40,9 @@ class Vehicle():
         """
             Uses the Department of Transportation's API to get the information of a vehicles VIN
 
+            https://vpic.nhtsa.dot.gov/api/
+
+
             :returns: Dictionary of data associated with a VIN
         """
         import requests
@@ -56,17 +60,24 @@ class Vehicle():
     def __fetchRecallData(self):
         """
         Uses the Department of Transportation's Recall API to search for current recalls on vehicle
-
+        https://www.nhtsa.gov/nhtsa-datasets-and-apis
         :returns: A list of dictionaries if a recall exists
         """
         import requests
         URL = f"https://api.nhtsa.gov/recalls/recallsByVehicle?make={self.make}&model={self.model}&modelYear={self.year}"
-        # post_field = {'format':'json', 'make':self.make, 'model':self.model, 'modelYear':self.year}
+        # URL = "https://api.nhtsa.gov/recalls/recallsByVehicle?make=acura&model=rdx&modelYear=2012"
         response = requests.get(URL)
 
-        print(json.loads(response.text)['results'])
+        data = json.loads(response.text)['results']
+        recallList = []
+        for dat in data:
+            recallList.append(Recall.Recall(dat))
 
-        return  json.loads(response.text)['results']
+        print(recallList)
+
+
+        return recallList
+        # return  json.loads(response.text)['results']
 
 def findVehicle(vin : str):
     """

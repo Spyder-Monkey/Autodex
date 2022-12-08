@@ -31,3 +31,6 @@ def listVehicle(vehicle : Vehicle):
     print(f"\tTrim: {vehicle.trim}")
     print(f"\tColor: {vehicle.color}")
     print(f"\tMiles: {vehicle.miles}")
+
+def listRecalls(vehicle : Vehicle):
+    pass
