@@ -1,9 +1,9 @@
 """
-Author      : Trevor Bender
 Filename    : cliController.py
 Description : 
 """
 
+import pyfiglet
 import cmd2
 from pick import pick
 
@@ -24,16 +24,8 @@ class cliController(cmd2.Cmd):
     def __init__(self):
         super().__init__(allow_cli_args=False)
 
-    """
-        * addCar
-        * editCar
-        * deleteCar
-        
-        * 
-    """
-
     addVehicleParser = cmd2.Cmd2ArgumentParser(description="Add a new vehicle")
-    addVehicleParser.add_argument('vin', help="Vehicle Identification Number")
+    addVehicleParser.add_argument('vin', help="Vehicle Identification Number (17 characters)")
     addVehicleParser.add_argument('color', help="Color of the vehicle")
     @cmd2.with_argparser(addVehicleParser)
     def do_addVehicle(self, arg):

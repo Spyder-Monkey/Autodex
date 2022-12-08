@@ -2,3 +2,4 @@ requests
 cmd2
 pick
 prettytable
+pyfiglet

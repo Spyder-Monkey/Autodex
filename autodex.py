@@ -1,3 +1,8 @@
+"""
+Filename    : autodex.py
+Description : Main driver code for the AutoDex program
+"""
+
 import Controllers.cliController as cliController
 
 def run():
