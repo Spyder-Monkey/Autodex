@@ -1,6 +1,7 @@
+import Controllers.cliController as cliController
 
-def main():
-    pass
+def run():
+    cliController.cliController().cmdloop()
 
 if __name__=="__main__":
-    main()
+    run()
