@@ -4,6 +4,7 @@ Description :
 """
 
 import pyfiglet
+import sys
 import cmd2
 from pick import pick
 
@@ -43,10 +44,14 @@ class cliController(cmd2.Cmd):
         Interface.listVehicles()
 
     def do_listVehicle(self, _):
-        option, index = pick(Vehicle.vehicleIndex, "Select a vehicle:", indicator=">> ")
+        option, _ = pick(Vehicle.vehicleIndex, "Select a vehicle:", indicator=">> ")
         Interface.listVehicle(option)
+
+    def do_listRecall(self, _):
+        option, _ = pick(Vehicle.vehicleIndex, "Select a vehicle:", indicator=">> ")
+        Interface.listRecalls(option)
     
 
     def do_exit(self, _):
-        exit()
+        sys.exit()
 

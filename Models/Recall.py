@@ -8,7 +8,6 @@ class Recall():
         self.campaignNum = data["NHTSACampaignNumber"]
         self.parkIt = data["parkIt"]
         self.parkOutside = data["parkOutSide"]
-        # self.actionNumber = data["NHTSAActionNumber"]
         self.reportReceiveDate = data["ReportReceivedDate"]
         self.component = data["Component"]
         self.summary = data["Summary"]

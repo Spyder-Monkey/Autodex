@@ -4,7 +4,7 @@ Description : Functions for commands involving the interface
 """
 
 import Models.Vehicle as Vehicle
-from prettytable import PrettyTable
+from prettytable import PrettyTable, SINGLE_BORDER, DOUBLE_BORDER
 
 def listVehicles():
     if len(Vehicle.vehicleIndex) > 0:
@@ -33,4 +33,12 @@ def listVehicle(vehicle : Vehicle):
     print(f"\tMiles: {vehicle.miles}")
 
 def listRecalls(vehicle : Vehicle):
-    pass
+    if len(vehicle.recalls) > 0:
+        table = PrettyTable()
+        table.set_style(SINGLE_BORDER)
+        table.title = vehicle
+        table.field_names = ["Date", "Campaign", "Component", "Consequence"]
+
+        for recall in vehicle.recalls:
+            table.add_row([recall.reportReceiveDate, recall.campaignNum, recall.component, recall.consequence])
+        print(table)

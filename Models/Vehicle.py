@@ -61,6 +61,7 @@ class Vehicle():
         """
         Uses the Department of Transportation's Recall API to search for current recalls on vehicle
         https://www.nhtsa.gov/nhtsa-datasets-and-apis
+        
         :returns: A list of dictionaries if a recall exists
         """
         import requests
@@ -77,7 +78,6 @@ class Vehicle():
 
 
         return recallList
-        # return  json.loads(response.text)['results']
 
 def findVehicle(vin : str):
     """
