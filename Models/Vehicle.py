@@ -34,7 +34,6 @@ class Vehicle():
         self.miles = miles
         self.engine = Engine.Engine(self.data)
         self.recalls = self.__fetchRecallData()
-        # self.color = self.__fetchVehicleColor()
 
     def __repr__(self) -> str:
         return f"{self.year} {self.make} {self.model} {self.trim} [{self.vin[-6:]}]"
@@ -96,8 +95,6 @@ class Vehicle():
         # Strip whitespace from strings and create a dictionary of title : value
         scrapedSpecs = {title.text.strip() : value.text.strip() for title, value in zip(titles, values)}
 
-        print(scrapedSpecs)
-
         return scrapedSpecs
 
     def __fetchRecallData(self):
@@ -115,9 +112,6 @@ class Vehicle():
         recallList = []
         for dat in data:
             recallList.append(Recall.Recall(dat))
-
-        print(recallList)
-
 
         return recallList
 
@@ -141,7 +135,9 @@ def addVehicle(vin : str):
     :param color: Color of the vehicle
     """
     if len(vin) == 17 and findVehicle(vin) == -1:
-        vehicleIndex.append(Vehicle(vin))
+        newVehicle = Vehicle(vin)
+        vehicleIndex.append(newVehicle)
+        print(f"\nAdded {newVehicle}")
     else:
         print(f"\n{vin} already exists")
 
