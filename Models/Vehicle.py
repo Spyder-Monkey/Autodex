@@ -14,6 +14,8 @@ Description : Model of Vehicle objects and their associated methods
 
 from typing import List
 import json
+import requests
+from bs4 import BeautifulSoup
 
 import Models.Engine as Engine
 import Models.Recall as Recall
@@ -28,10 +30,11 @@ class Vehicle():
         self.trim = self.data['Trim']
         self.type = self.data['VehicleType']
         self.doors = self.data['Doors']
-        self.color = color
+        # self.color = color
         self.miles = miles
         self.engine = Engine.Engine(self.data)
         self.recalls = self.__fetchRecallData()
+        self.color = self.__fetchVehicleColor()
 
     def __repr__(self) -> str:
         return f"{self.year} {self.make} {self.model} {self.trim} [{self.vin[-6:]}]"
@@ -45,7 +48,6 @@ class Vehicle():
 
             :returns: Dictionary of data associated with a VIN
         """
-        import requests
         # URL to pull VIN info from
         URL = 'https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVINValuesBatch/'
         # Information used to pull information
@@ -57,6 +59,47 @@ class Vehicle():
 
         return vehicleData['Results'][0]
 
+    def __fetchVehicleColor(self):
+        import os
+        from selenium import webdriver
+        from selenium.webdriver.firefox.options import Options
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        from selenium.webdriver.common.keys import Keys
+
+        # Get path to geckodriver executable        
+        exePath = os.path.dirname(os.path.dirname(__file__))+"/geckodriver"
+
+        # Set browser options
+        options = Options()
+        options.headless = True # Hide the GUI
+        # Create a Firefox webdriver
+        driver = webdriver.Firefox(executable_path=exePath, options=options)
+        driver.get(f'https://www.vehiclehistory.com')
+        # Find the search box on the web page
+        searchBox = driver.find_element_by_css_selector('input[id="input-1"]')
+        # Fill search box with vehicle VIN
+        searchBox.send_keys(self.vin)
+        # Press the enter key
+        searchBox.send_keys(Keys.ENTER)
+        # Wait for the div with class EquipmentDetails-item to load
+        WebDriverWait(driver=driver, timeout=5).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, 'div.EquipmentDetails-item'))
+        )
+
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        # Exctract vehicle specs
+        specs = soup.find('div', class_='VehicleSpecifications-section')
+        titles = specs.find_all('div', class_='EquipmentDetails-title')
+        values = specs.find_all('div', class_='EquipmentDetails-value')
+        # Strip whitespace from strings and create a dictionary of title : value
+        scrapedSpecs = {title.text.strip() : value.text.strip() for title, value in zip(titles, values)}
+
+        print(scrapedSpecs)
+
+        return scrapedSpecs
+
     def __fetchRecallData(self):
         """
         Uses the Department of Transportation's Recall API to search for current recalls on vehicle
@@ -64,7 +107,6 @@ class Vehicle():
         
         :returns: A list of dictionaries if a recall exists
         """
-        import requests
         URL = f"https://api.nhtsa.gov/recalls/recallsByVehicle?make={self.make}&model={self.model}&modelYear={self.year}"
         # URL = "https://api.nhtsa.gov/recalls/recallsByVehicle?make=acura&model=rdx&modelYear=2012"
         response = requests.get(URL)

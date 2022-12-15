@@ -3,3 +3,4 @@ cmd2
 pick
 prettytable
 pyfiglet
+selenium
