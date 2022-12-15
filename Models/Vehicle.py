@@ -23,18 +23,18 @@ import Models.Recall as Recall
 class Vehicle():
     def __init__(self, vin:str, miles:int=0):
         self.vin = vin
-        self.data = self.__fetchVINData()
+        self.data = self.__fetchVehicleData()
         self.make = self.data['Make']
         self.model = self.data['Model']
-        self.year = self.data['ModelYear']
-        self.trim = self.data['Trim']
-        self.type = self.data['VehicleType']
+        self.year = self.data['Model Year']
+        self.trim = self.data['Series']
+        self.type = self.data['Body Style']
         self.doors = self.data['Doors']
-        # self.color = color
+        self.color = self.data['Exterior Color']
         self.miles = miles
         self.engine = Engine.Engine(self.data)
         self.recalls = self.__fetchRecallData()
-        self.color = self.__fetchVehicleColor()
+        # self.color = self.__fetchVehicleColor()
 
     def __repr__(self) -> str:
         return f"{self.year} {self.make} {self.model} {self.trim} [{self.vin[-6:]}]"
@@ -59,7 +59,7 @@ class Vehicle():
 
         return vehicleData['Results'][0]
 
-    def __fetchVehicleColor(self):
+    def __fetchVehicleData(self):
         import os
         from selenium import webdriver
         from selenium.webdriver.firefox.options import Options
