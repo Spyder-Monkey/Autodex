@@ -27,10 +27,9 @@ class cliController(cmd2.Cmd):
 
     addVehicleParser = cmd2.Cmd2ArgumentParser(description="Add a new vehicle")
     addVehicleParser.add_argument('vin', help="Vehicle Identification Number (17 characters)")
-    addVehicleParser.add_argument('color', help="Color of the vehicle")
     @cmd2.with_argparser(addVehicleParser)
     def do_addVehicle(self, arg):
-        Vehicle.addVehicle(arg.vin, arg.color)
+        Vehicle.addVehicle(arg.vin)
 
     def do_editVehicle(self, _):
         vehicleOption, _ = pick(Vehicle.vehicleIndex, "Select a vehicle to edit:", indicator=">> ")

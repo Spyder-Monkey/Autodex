@@ -21,7 +21,7 @@ import Models.Engine as Engine
 import Models.Recall as Recall
 
 class Vehicle():
-    def __init__(self, vin:str, color:str, miles:int=0):
+    def __init__(self, vin:str, miles:int=0):
         self.vin = vin
         self.data = self.__fetchVINData()
         self.make = self.data['Make']
@@ -133,7 +133,7 @@ def findVehicle(vin : str):
             return i
     return -1
 
-def addVehicle(vin : str, color : str):
+def addVehicle(vin : str):
     """
     Adds a new vehicle to vehicleIndex if the vin does not already exist
 
@@ -141,7 +141,7 @@ def addVehicle(vin : str, color : str):
     :param color: Color of the vehicle
     """
     if len(vin) == 17 and findVehicle(vin) == -1:
-        vehicleIndex.append(Vehicle(vin, color))
+        vehicleIndex.append(Vehicle(vin))
     else:
         print(f"\n{vin} already exists")
 
