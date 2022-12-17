@@ -22,7 +22,7 @@ import Models.Recall as Recall
 
 class Vehicle():
     def __init__(self, vin:str, miles:int):
-        self.vin = vin
+        self.vin = vin.upper()
         self.data = self.__fetchVehicleData()
         self.make = self.data['Make']
         self.model = self.data['Model']
