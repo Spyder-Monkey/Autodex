@@ -27,9 +27,17 @@ class cliController(cmd2.Cmd):
 
     addVehicleParser = cmd2.Cmd2ArgumentParser(description="Add a new vehicle")
     addVehicleParser.add_argument('vin', help="Vehicle Identification Number (17 characters)")
+    addVehicleParser.add_argument('miles', nargs=(0,1), type=int, help="Number of miles vehicle has driven")
     @cmd2.with_argparser(addVehicleParser)
     def do_addVehicle(self, arg):
-        Vehicle.addVehicle(arg.vin)
+        if len(arg.vin) != 17:
+            print("VIN should be 17 characters long")
+            return
+
+        if arg.miles:
+            Vehicle.addVehicle(arg.vin, arg.miles)
+        else:
+            Vehicle.addVehicle(arg.vin)
 
     def do_editVehicle(self, _):
         vehicleOption, _ = pick(Vehicle.vehicleIndex, "Select a vehicle to edit:", indicator=">> ")
