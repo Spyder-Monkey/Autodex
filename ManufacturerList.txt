@@ -27,7 +27,7 @@ Infinity
 Isuzu
 Jaguar
 Jeep
-Kla
+Kia
 Lamborghini
 Land Rover
 Lexus
@@ -50,7 +50,7 @@ Pontiac
 Porsche
 Ram
 Rivian
-Rolls_Royce
+Rolls Royce
 Saab
 Saturn
 Smart
