@@ -4,3 +4,5 @@ pick
 prettytable
 pyfiglet
 selenium
+boto3
+psycopg2
