@@ -16,24 +16,80 @@ from typing import List
 import json
 import requests
 from bs4 import BeautifulSoup
+import psycopg2
+import boto3
+import os
+from dotenv import load_dotenv
 
 import Models.Engine as Engine
 import Models.Recall as Recall
 
+load_dotenv('secrets.env')
+
+ENDPOINT = os.getenv('ENDPOINT')
+PORT = os.getenv('PORT')
+USER = os.getenv('DBUSER')
+PASS = os.getenv('DBPASS')
+REGION = os.getenv('REGION')
+DBNAME = os.getenv('DBNAME')
+
+session = boto3.Session(profile_name="default")
+client = session.client('rds')
+
 class Vehicle():
-    def __init__(self, vin:str, miles:int):
+    # def __init__(self, vin:str, miles:int):
+    #     self.vin = vin.upper()
+    #     self.data = self.__fetchVehicleData()
+    #     self.make = self.data['Make']
+    #     self.model = self.data['Model']
+    #     self.year = self.data['Model Year']
+    #     self.trim = self.data['Series']
+    #     self.type = self.data['Body Style']
+    #     self.doors = self.data['Doors']
+    #     self.color = self.data['Exterior Color']
+    #     self.miles = miles
+    #     self.engine = Engine.Engine(self.data)
+    #     self.recalls = self.__fetchRecallData()
+
+    def __init__(self, vin:str):
         self.vin = vin.upper()
-        self.data = self.__fetchVehicleData()
-        self.make = self.data['Make']
-        self.model = self.data['Model']
-        self.year = self.data['Model Year']
-        self.trim = self.data['Series']
-        self.type = self.data['Body Style']
-        self.doors = self.data['Doors']
-        self.color = self.data['Exterior Color']
-        self.miles = miles
-        self.engine = Engine.Engine(self.data)
-        self.recalls = self.__fetchRecallData()
+        if len(self.vin) != 17:
+            return
+        self.data = self.__fetchVINData()
+        if self.data['ErrorCode'] == "0":
+            self.make = self.data['MakeID']
+            self.model = self.data['ModelID']
+            self.year = int(self.data['ModelYear'])
+            self.body = self.data['BodyClass']
+            self.trim = self.data['Trim']
+            self.doors = self.data['Doors']
+            self.engine = Engine.Engine(self.data)
+
+            try:
+                conn = psycopg2.connect(
+                    host=ENDPOINT, 
+                    port=PORT, 
+                    database=DBNAME,
+                    user=USER, 
+                    password=PASS, 
+                    sslrootcert='SSLCERTIFICATE'
+                )
+                cur = conn.cursor()
+
+                print(type(self.year))
+
+                # Add engine to DB
+                cur.execute(f"""INSERT INTO engines VALUES ('{self.engine.model}', {self.engine.horsePower}, {self.engine.displacementL}, {self.engine.cylinders}, '{self.engine.configuration}', '{self.engine.driveType}', '{self.engine.fuelType}')""")
+                # Add vehicle to DB
+                cur.execute(f"""INSERT INTO vehicle VALUES ('{self.vin}', 'Black', {self.make}, {self.model}, 1, '{self.engine.model}', {self.year})""")
+                conn.commit()
+                cur.execute("""SELECT * FROM vehicle""")
+                results = cur.fetchall()
+                print(results)
+            except Exception as e:
+                print("Connection failed: {}".format(e))
+        else:
+            print("VIN error")
 
     def __repr__(self) -> str:
         return f"{self.year} {self.make} {self.model} {self.trim} [{self.vin[-6:]}]"
@@ -127,7 +183,7 @@ def findVehicle(vin : str):
             return i
     return -1
 
-def addVehicle(vin : str, miles:int=0):
+def addVehicle(vin : str):
     """
     Adds a new vehicle to vehicleIndex if the vin does not already exist
 
@@ -135,8 +191,9 @@ def addVehicle(vin : str, miles:int=0):
     :param color: Color of the vehicle
     """
     if len(vin) == 17 and findVehicle(vin) == -1:
-        newVehicle = Vehicle(vin, miles)
+        newVehicle = Vehicle(vin)
         vehicleIndex.append(newVehicle)
+
         print(f"\nAdded {newVehicle}")
     else:
         print(f"\n{vin} already exists")

@@ -7,6 +7,10 @@ import pyfiglet
 import sys
 import cmd2
 from pick import pick
+import psycopg2
+import boto3
+import os
+from dotenv import load_dotenv
 
 # Local Imports
 import Models.Vehicle as Vehicle
@@ -18,8 +22,21 @@ Type `help` for an overview `help <command>` for more details.
 Type `exit` to quit.
 """
 
+load_dotenv('secrets.env')
+
+ENDPOINT = os.getenv('ENDPOINT')
+PORT = os.getenv('PORT')
+USER = os.getenv('DBUSER')
+REGION = os.getenv('REGION')
+DBNAME = os.getenv('DBNAME')
+
+session = boto3.Session(profile_name="default")
+client = session.client('rds')
+
+
+
 class cliController(cmd2.Cmd):
-    intro = _intro_text.format("AutoDex")
+    intro = _intro_text.format(pyfiglet.figlet_format("AutoDex"))
     prompt = ">> "
 
     def __init__(self):
@@ -37,10 +54,11 @@ class cliController(cmd2.Cmd):
             print("VIN should be 17 characters long")
             return
 
-        if arg.miles:
-            Vehicle.addVehicle(arg.vin, arg.miles)
-        else:
-            Vehicle.addVehicle(arg.vin)
+        # if arg.miles:
+        #     Vehicle.addVehicle(arg.vin, arg.miles)
+        # else:
+        
+        Vehicle.addVehicle(arg.vin)
 
     def do_editVehicle(self, _):
         """
@@ -69,6 +87,11 @@ class cliController(cmd2.Cmd):
         """
         option, _ = pick(Vehicle.vehicleIndex, "Select a vehicle:", indicator=">> ")
         Interface.listVehicle(option)
+
+    def do_listMakes(self, _):
+        """
+        List all makes stored in database
+        """
 
     def do_listRecall(self, _):
         """

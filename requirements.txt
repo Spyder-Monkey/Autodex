@@ -5,4 +5,8 @@ prettytable
 pyfiglet
 selenium
 boto3
-psycopg2
+psycopg2-binary
+gnureadline
+pyreadline3
+bs4
+python-dotenv
