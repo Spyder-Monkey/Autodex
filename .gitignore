@@ -9,6 +9,9 @@ __pycache__/
 # Ignore .md files
 *.md
 
+# Ignore secrets file
+secrets.env
+
 # Except README.md
 !README.md
 
