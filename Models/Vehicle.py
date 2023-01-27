@@ -3,15 +3,6 @@ Filename    : Vehicle.py
 Description : Model of Vehicle objects and their associated methods
 """
 
-
-"""
-    * Options (Object)
-    * MaintHistory??? (Object)
-    * User Manual????
-    * Owners
-    * AccidentHistory (Object)
-"""
-
 from typing import List
 import json
 import requests
@@ -83,7 +74,11 @@ class Vehicle():
                 # Add vehicle to DB
                 cur.execute(f"""INSERT INTO vehicle VALUES ('{self.vin}', 'Black', {self.make}, {self.model}, 1, '{self.engine.model}', {self.year})""")
                 conn.commit()
-                cur.execute("""SELECT * FROM vehicle""")
+
+                user = input()
+                paswd = input()
+                ##### PREVENTS SQL INJECTION ATTACKS https://www.psycopg.org/psycopg3/docs/basic/params.html
+                cur.execute(f"""SELECT (username, password) FROM users WHERE username=%s and password=%s""", (user, paswd))
                 results = cur.fetchall()
                 print(results)
             except Exception as e:
