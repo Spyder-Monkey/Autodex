@@ -67,20 +67,18 @@ class Vehicle():
                 )
                 cur = conn.cursor()
 
-                print(type(self.year))
-
                 # Add engine to DB
-                cur.execute(f"""INSERT INTO engines VALUES ('{self.engine.model}', {self.engine.horsePower}, {self.engine.displacementL}, {self.engine.cylinders}, '{self.engine.configuration}', '{self.engine.driveType}', '{self.engine.fuelType}')""")
+                cur.execute(f"""INSERT INTO engine (model, horsepower, displacement, cylinders, configuration, drive_type, fuel_type) VALUES ('{self.engine.model}', {self.engine.horsePower}, {self.engine.displacementL}, {self.engine.cylinders}, '{self.engine.configuration}', '{self.engine.driveType}', '{self.engine.fuelType}')""")
+                conn.commit()
                 # Add vehicle to DB
-                cur.execute(f"""INSERT INTO vehicle VALUES ('{self.vin}', 'Black', {self.make}, {self.model}, 1, '{self.engine.model}', {self.year})""")
+                cur.execute(f"""INSERT INTO vehicle VALUES ('{self.vin}', {self.year}, 'Black', {self.make}, {self.model}, 1, (select id from engine where model='{self.engine.model}'))""")
                 conn.commit()
 
-                user = input()
-                paswd = input()
                 ##### PREVENTS SQL INJECTION ATTACKS https://www.psycopg.org/psycopg3/docs/basic/params.html
-                cur.execute(f"""SELECT (username, password) FROM users WHERE username=%s and password=%s""", (user, paswd))
-                results = cur.fetchall()
-                print(results)
+                # cur.execute(f"""SELECT (username, password) FROM users WHERE username=%s and password=%s""", (user, paswd))
+                # results = cur.fetchall()
+                # print(results)
+
             except Exception as e:
                 print("Connection failed: {}".format(e))
         else:

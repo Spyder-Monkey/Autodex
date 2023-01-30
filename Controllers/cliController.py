@@ -81,12 +81,15 @@ class cliController(cmd2.Cmd):
         """
         Interface.listVehicles()
 
-    def do_listVehicle(self, _):
+    listVehicleParser = cmd2.Cmd2ArgumentParser(description="")
+    listVehicleParser.add_argument('vin', help="Vehicle Identification Number (17) characters long")
+    @cmd2.with_argparser(listVehicleParser)
+    def do_listVehicle(self, arg):
         """
         List the specs of a specific vehicle
         """
-        option, _ = pick(Vehicle.vehicleIndex, "Select a vehicle:", indicator=">> ")
-        Interface.listVehicle(option)
+        # option, _ = pick(Vehicle.vehicleIndex, "Select a vehicle:", indicator=">> ")
+        Interface.listVehicle(arg.vin)
 
     def do_listMakes(self, _):
         """
