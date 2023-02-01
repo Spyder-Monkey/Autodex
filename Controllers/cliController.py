@@ -91,6 +91,13 @@ class cliController(cmd2.Cmd):
         # option, _ = pick(Vehicle.vehicleIndex, "Select a vehicle:", indicator=">> ")
         Interface.listVehicle(arg.vin)
 
+    @cmd2.with_argparser(listVehicleParser)
+    def do_listEngine(self, arg):
+        """
+        List the engine specs of a specific vin
+        """
+        Interface.listEngine(arg.vin)
+
     def do_listMakes(self, _):
         """
         List all makes stored in database

@@ -65,15 +65,20 @@ class Vehicle():
                     password=PASS, 
                     sslrootcert='SSLCERTIFICATE'
                 )
+                conn.autocommit = True
                 cur = conn.cursor()
 
-                # Add engine to DB
-                cur.execute(f"""INSERT INTO engine (model, horsepower, displacement, cylinders, configuration, drive_type, fuel_type) VALUES ('{self.engine.model}', {self.engine.horsePower}, {self.engine.displacementL}, {self.engine.cylinders}, '{self.engine.configuration}', '{self.engine.driveType}', '{self.engine.fuelType}')""")
-                conn.commit()
-                # Add vehicle to DB
-                cur.execute(f"""INSERT INTO vehicle VALUES ('{self.vin}', {self.year}, 'Black', {self.make}, {self.model}, 1, (select id from engine where model='{self.engine.model}'))""")
-                conn.commit()
+                # Add body type to DB
+                cur.execute(f"""INSERT INTO body (type)
+                            select '{self.body}'
+                            WHERE
+                            NOT EXISTS (SELECT type FROM body WHERE type='{self.body}')""")
 
+                # Add vehicle to DB                
+                cur.execute(f"""INSERT INTO vehicle SELECT '{self.vin}', {self.year}, 'Black', {self.make}, {self.model}, 1, (SELECT id FROM engine WHERE model='{self.engine.model}')
+                            WHERE
+                            NOT EXISTS (SELECT vin FROM vehicle WHERE vin='{self.vin}')""")
+                
                 ##### PREVENTS SQL INJECTION ATTACKS https://www.psycopg.org/psycopg3/docs/basic/params.html
                 # cur.execute(f"""SELECT (username, password) FROM users WHERE username=%s and password=%s""", (user, paswd))
                 # results = cur.fetchall()
@@ -181,13 +186,14 @@ def addVehicle(vin : str):
     Adds a new vehicle to vehicleIndex if the vin does not already exist
 
     :param vin: VIN of the vehicle to be added
-    :param color: Color of the vehicle
     """
     if len(vin) == 17 and findVehicle(vin) == -1:
         newVehicle = Vehicle(vin)
         vehicleIndex.append(newVehicle)
 
         print(f"\nAdded {newVehicle}")
+    elif len(vin) != 17:
+        print(f"\nVIN must be 17 characters long")
     else:
         print(f"\n{vin} already exists")
 
@@ -216,9 +222,6 @@ def editVehicle(vehicle : Vehicle, editOption : str):
         vehicle.miles = input("(New miles)>> ")
     elif editOption == 'Color':
         vehicle.color = input("(New color)>> ")
-
-def searchForRecalls(vehicle : Vehicle):
-    pass
 
 #####################################################################################
 

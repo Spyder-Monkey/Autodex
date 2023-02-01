@@ -25,22 +25,42 @@ session = boto3.Session(profile_name="default")
 client = session.client('rds')
 
 def listVehicles():
-    if len(Vehicle.vehicleIndex) > 0:
+    try:
+        conn = psycopg2.connect(
+            host = ENDPOINT,
+            port = PORT,
+            database = DBNAME,
+            user = USER,
+            password = PASS,
+            sslrootcert = 'SSLCERTIFICATE'
+        )
+        cur = conn.cursor()
+        # Get vehicle and engine info
+        cur.execute("""SELECT vehicle.vin, vehicle.year, model.model_name, make.make_name, body.type, engine.model, engine.horsepower
+                    FROM vehicle
+                    JOIN model ON vehicle.model_id = model.id
+                    JOIN make ON vehicle.make_id = make.id
+                    JOIN body ON vehicle.body_id = body.id
+                    JOIN engine ON vehicle.engine_id = engine.id""")
+        
+        results = cur.fetchall()
+        # Create table for output
         table = PrettyTable()
         table.set_style(SINGLE_BORDER)
-        table.field_names = ["VIN", "Year", "Make", "Model", "Trim", "Color", "Miles", "Engine Model", "Recalls"]
-        for vehicle in Vehicle.vehicleIndex:
-           
-            table.add_row([vehicle.vin, vehicle.year, vehicle.make, vehicle.model, vehicle.trim, vehicle.color, vehicle.miles, vehicle.engine.model, len(vehicle.recalls)])
+        table.field_names = ["VIN", "Year", "Make", "Model", "Body", "Engine Model", "Horsepower"]
+        # Add the rows to the table
+        for row in results:
+            table.add_row([row[0], row[1], row[3], row[2], row[4], row[5], row[6]])
+
         print(table)
-    else:
-        print(f'\nNo vehicles have been added')
+    except Exception as e:
+        print(f"Connection failed due to: {e}")
 
 def listVehicle(vin : str):
     """
     List the contents of a specific vehicle
 
-    :param vehicle: target Vehicle object
+    :param vin: VIN of the target vehicle
     """
 
     try:
@@ -54,23 +74,51 @@ def listVehicle(vin : str):
         )
         cur = conn.cursor()
 
-        cur.execute(f"""SELECT * FROM vehicle WHERE vin='{vin}'""")
+        cur.execute(f"""SELECT vehicle.vin, vehicle.year, model.model_name, make.make_name, body.type, engine.model, engine.horsepower 
+                        FROM vehicle 
+                        JOIN model ON vehicle.model_id = model.id 
+                        JOIN make ON vehicle.make_id = make.id
+                        JOIN body ON vehicle.body_id = body.id 
+                        JOIN engine ON vehicle.engine_id = engine.id 
+                        WHERE vin=%s""", (vin))
+
         results = cur.fetchone()
-        
-        table = PrettyTable(header=False)
+        table = PrettyTable()
+        table.title = results[0]
         table.set_style(SINGLE_BORDER)
-        table.add_column("", ["Make", "Model", "Year", "Color", "Body", "Engine"])
-        table.add_column("", [results[3], results[4], results[1], results[2], results[5], results[6]])
+        table.field_names = ["Make", "Model", "Year", "Body", "Engine", "Horsepower"]
+        table.add_row([results[3], results[2], results[1], results[4], results[5], results[6]])
         print(table)
+        
     except Exception as e:
         print("Connection failed due to: {}".format(e))
 
-    # table = PrettyTable(header=False)
-    # table.set_style(SINGLE_BORDER)
-    # table.add_column("", ["Make", "Model", "Year", "Trim", "Color", "Miles"])
-    # table.add_column("", [vehicle.make, vehicle.model, vehicle.year, vehicle.trim, vehicle.color, vehicle.miles])
+def listEngine(vin : str):
+    try:
+        conn = psycopg2.connect(
+            host=ENDPOINT,
+            port=PORT,
+            database=DBNAME,
+            user=USER,
+            password=PASS,
+            sslrootcert='SSLCERTIFICATE'
+        )
+        cur = conn.cursor()
 
-    # print(table)
+        cur.execute(f"""SELECT engine.model, engine.horsepower, engine.displacement, engine.cylinders, engine.configuration, engine.drive_type, engine.fuel_type
+                    FROM engine 
+                    WHERE engine.id = (SELECT vehicle.engine_id FROM vehicle WHERE vin=%s)""", (vin))
+        
+        results = cur.fetchone()
+
+        table = PrettyTable()
+        table.set_style(SINGLE_BORDER)
+        table.field_names = ["Model", "Horsepower", "Displacement (L)", "Cylinders", "Configuration", "Drive Type", "Fuel"]
+        table.add_row([results[0], results[1], results[2], results[3], results[4], results[5], results[6]])
+        print(table)
+
+    except Exception as e:
+        print(f"Failed to connect: {e}")
 
 def listRecalls(vehicle : Vehicle):
     if len(vehicle.recalls) > 0:
