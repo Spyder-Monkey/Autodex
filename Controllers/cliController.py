@@ -102,6 +102,7 @@ class cliController(cmd2.Cmd):
         """
         List all makes stored in database
         """
+        Interface.listMakes()
 
     def do_listRecall(self, _):
         """

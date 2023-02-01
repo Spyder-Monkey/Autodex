@@ -80,7 +80,7 @@ def listVehicle(vin : str):
                         JOIN make ON vehicle.make_id = make.id
                         JOIN body ON vehicle.body_id = body.id 
                         JOIN engine ON vehicle.engine_id = engine.id 
-                        WHERE vin=%s""", (vin))
+                        WHERE vin='{vin}'""")
 
         results = cur.fetchone()
         table = PrettyTable()
@@ -107,7 +107,7 @@ def listEngine(vin : str):
 
         cur.execute(f"""SELECT engine.model, engine.horsepower, engine.displacement, engine.cylinders, engine.configuration, engine.drive_type, engine.fuel_type
                     FROM engine 
-                    WHERE engine.id = (SELECT vehicle.engine_id FROM vehicle WHERE vin=%s)""", (vin))
+                    WHERE engine.id = (SELECT vehicle.engine_id FROM vehicle WHERE vin='{vin}')""")
         
         results = cur.fetchone()
 
@@ -119,6 +119,24 @@ def listEngine(vin : str):
 
     except Exception as e:
         print(f"Failed to connect: {e}")
+
+def listMakes():
+    try:
+        conn = psycopg2.connect(
+            host=ENDPOINT,
+            port=PORT,
+            database=DBNAME,
+            user=USER,
+            password=PASS,
+            sslrootcert='SSLCERTIFICATE'
+        )
+        cur = conn.cursor()
+
+        cur.execute("""SELECT make_name FROM make""")
+        results = cur.fetchall()
+        print(results)
+    except Exception as e:
+        print(f"Failed to connect to database: {e}")
 
 def listRecalls(vehicle : Vehicle):
     if len(vehicle.recalls) > 0:

@@ -75,7 +75,8 @@ class Vehicle():
                             NOT EXISTS (SELECT type FROM body WHERE type='{self.body}')""")
 
                 # Add vehicle to DB                
-                cur.execute(f"""INSERT INTO vehicle SELECT '{self.vin}', {self.year}, 'Black', {self.make}, {self.model}, 1, (SELECT id FROM engine WHERE model='{self.engine.model}')
+                cur.execute(f"""INSERT INTO vehicle 
+                            SELECT '{self.vin}', {self.year}, 'Black', {self.make}, {self.model}, 1, (SELECT id FROM engine WHERE model='{self.engine.model}')
                             WHERE
                             NOT EXISTS (SELECT vin FROM vehicle WHERE vin='{self.vin}')""")
                 
