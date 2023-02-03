@@ -4,36 +4,12 @@ Description : Functions for commands involving the interface
 """
 
 import Models.Vehicle as Vehicle
+import database as db
 from prettytable import PrettyTable, SINGLE_BORDER
-# PSQL connection
-import psycopg2
-import boto3
-import os
-
-from dotenv import load_dotenv
-
-load_dotenv('secrets.env')
-
-ENDPOINT = os.getenv('ENDPOINT')
-PORT = os.getenv('PORT')
-USER = os.getenv('DBUSER')
-PASS = os.getenv('DBPASS')
-REGION = os.getenv('REGION')
-DBNAME = os.getenv('DBNAME')
-
-session = boto3.Session(profile_name="default")
-client = session.client('rds')
 
 def listVehicles():
     try:
-        conn = psycopg2.connect(
-            host = ENDPOINT,
-            port = PORT,
-            database = DBNAME,
-            user = USER,
-            password = PASS,
-            sslrootcert = 'SSLCERTIFICATE'
-        )
+        conn = db.connect()
         cur = conn.cursor()
         # Get vehicle and engine info
         cur.execute("""SELECT vehicle.vin, vehicle.year, model.model_name, make.make_name, body.type, engine.model, engine.horsepower
@@ -64,14 +40,7 @@ def listVehicle(vin : str):
     """
 
     try:
-        conn = psycopg2.connect(
-            host=ENDPOINT,
-            port=PORT,
-            database=DBNAME,
-            user=USER,
-            password=PASS,
-            sslrootcert='SSLCERTIFICATE'
-        )
+        conn = db.connect()
         cur = conn.cursor()
 
         cur.execute(f"""SELECT vehicle.vin, vehicle.year, model.model_name, make.make_name, body.type, engine.model, engine.horsepower 
@@ -95,14 +64,7 @@ def listVehicle(vin : str):
 
 def listEngine(vin : str):
     try:
-        conn = psycopg2.connect(
-            host=ENDPOINT,
-            port=PORT,
-            database=DBNAME,
-            user=USER,
-            password=PASS,
-            sslrootcert='SSLCERTIFICATE'
-        )
+        conn = db.connect()
         cur = conn.cursor()
 
         cur.execute(f"""SELECT engine.model, engine.horsepower, engine.displacement, engine.cylinders, engine.configuration, engine.drive_type, engine.fuel_type
@@ -113,6 +75,7 @@ def listEngine(vin : str):
 
         table = PrettyTable()
         table.set_style(SINGLE_BORDER)
+        table.title = vin.upper() + " ENGINE"
         table.field_names = ["Model", "Horsepower", "Displacement (L)", "Cylinders", "Configuration", "Drive Type", "Fuel"]
         table.add_row([results[0], results[1], results[2], results[3], results[4], results[5], results[6]])
         print(table)
@@ -122,19 +85,41 @@ def listEngine(vin : str):
 
 def listMakes():
     try:
-        conn = psycopg2.connect(
-            host=ENDPOINT,
-            port=PORT,
-            database=DBNAME,
-            user=USER,
-            password=PASS,
-            sslrootcert='SSLCERTIFICATE'
-        )
+        conn = db.connect()
         cur = conn.cursor()
 
-        cur.execute("""SELECT make_name FROM make""")
+        cur.execute("""SELECT * FROM make""")
         results = cur.fetchall()
-        print(results)
+
+        table = PrettyTable()
+        table.set_style(SINGLE_BORDER)
+        table.title = "ALL MAKES"
+        table.field_names = ["ID", "Make"]
+
+        for result in results:
+            table.add_row([result[0], result[1]])
+
+        print(table)
+    except Exception as e:
+        print(f"Failed to connect to database: {e}")
+
+def listModels(make : str):
+    try:
+        conn = db.connect()
+        cur = conn.cursor()
+        # Query to get the model id and name for the specified make
+        cur.execute(f"""SELECT id, model_name FROM model WHERE make_name='{make.upper()}'""")
+        results = cur.fetchall()
+        # Create a table for output
+        table = PrettyTable()
+        table.set_style(SINGLE_BORDER)
+        table.title = make.upper()
+        table.field_names = ["Model ID", "Model"]
+        # Add all models to table
+        for result in results:
+            table.add_row([result[0], result[1]])
+
+        print(table)
     except Exception as e:
         print(f"Failed to connect to database: {e}")
 

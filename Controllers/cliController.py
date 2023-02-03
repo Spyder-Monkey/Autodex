@@ -104,6 +104,12 @@ class cliController(cmd2.Cmd):
         """
         Interface.listMakes()
 
+    listModelsParser = cmd2.Cmd2ArgumentParser(description="")
+    listModelsParser.add_argument('make', help="Make to list all models of")
+    @cmd2.with_argparser(listModelsParser)
+    def do_listModels(self, arg):
+        Interface.listModels(arg.make)
+
     def do_listRecall(self, _):
         """
         List all recalls (past and present) on a vehicle

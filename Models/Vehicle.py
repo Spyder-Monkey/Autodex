@@ -7,41 +7,12 @@ from typing import List
 import json
 import requests
 from bs4 import BeautifulSoup
-import psycopg2
-import boto3
-import os
-from dotenv import load_dotenv
 
 import Models.Engine as Engine
 import Models.Recall as Recall
-
-load_dotenv('secrets.env')
-
-ENDPOINT = os.getenv('ENDPOINT')
-PORT = os.getenv('PORT')
-USER = os.getenv('DBUSER')
-PASS = os.getenv('DBPASS')
-REGION = os.getenv('REGION')
-DBNAME = os.getenv('DBNAME')
-
-session = boto3.Session(profile_name="default")
-client = session.client('rds')
+import database as db
 
 class Vehicle():
-    # def __init__(self, vin:str, miles:int):
-    #     self.vin = vin.upper()
-    #     self.data = self.__fetchVehicleData()
-    #     self.make = self.data['Make']
-    #     self.model = self.data['Model']
-    #     self.year = self.data['Model Year']
-    #     self.trim = self.data['Series']
-    #     self.type = self.data['Body Style']
-    #     self.doors = self.data['Doors']
-    #     self.color = self.data['Exterior Color']
-    #     self.miles = miles
-    #     self.engine = Engine.Engine(self.data)
-    #     self.recalls = self.__fetchRecallData()
-
     def __init__(self, vin:str):
         self.vin = vin.upper()
         if len(self.vin) != 17:
@@ -57,14 +28,7 @@ class Vehicle():
             self.engine = Engine.Engine(self.data)
 
             try:
-                conn = psycopg2.connect(
-                    host=ENDPOINT, 
-                    port=PORT, 
-                    database=DBNAME,
-                    user=USER, 
-                    password=PASS, 
-                    sslrootcert='SSLCERTIFICATE'
-                )
+                conn = db.connect()
                 conn.autocommit = True
                 cur = conn.cursor()
 
@@ -76,7 +40,7 @@ class Vehicle():
 
                 # Add vehicle to DB                
                 cur.execute(f"""INSERT INTO vehicle 
-                            SELECT '{self.vin}', {self.year}, 'Black', {self.make}, {self.model}, 1, (SELECT id FROM engine WHERE model='{self.engine.model}')
+                            SELECT '{self.vin}', {self.year}, 'Black', {self.make}, {self.model}, (SELECT id FROM body WHERE type='{self.body}'), (SELECT id FROM engine WHERE model='{self.engine.model}')
                             WHERE
                             NOT EXISTS (SELECT vin FROM vehicle WHERE vin='{self.vin}')""")
                 
@@ -112,45 +76,6 @@ class Vehicle():
         vehicleData = json.loads(r.text)
 
         return vehicleData['Results'][0]
-
-    def __fetchVehicleData(self):
-        import os
-        from selenium import webdriver
-        from selenium.webdriver.firefox.options import Options
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.support.ui import WebDriverWait
-        from selenium.webdriver.support import expected_conditions as EC
-        from selenium.webdriver.common.keys import Keys
-
-        # Get path to geckodriver executable        
-        exePath = os.path.dirname(os.path.dirname(__file__))+"/geckodriver"
-
-        # Set browser options
-        options = Options()
-        options.headless = True # Hide the GUI
-        # Create a Firefox webdriver
-        driver = webdriver.Firefox(executable_path=exePath, options=options)
-        driver.get(f'https://www.vehiclehistory.com')
-        # Find the search box on the web page
-        searchBox = driver.find_element_by_css_selector('input[id="input-1"]')
-        # Fill search box with vehicle VIN
-        searchBox.send_keys(self.vin)
-        # Press the enter key
-        searchBox.send_keys(Keys.ENTER)
-        # Wait for the div with class EquipmentDetails-item to load
-        WebDriverWait(driver=driver, timeout=5).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, 'div.EquipmentDetails-item'))
-        )
-
-        soup = BeautifulSoup(driver.page_source, 'html.parser')
-        # Exctract vehicle specs
-        specs = soup.find('div', class_='VehicleSpecifications-section')
-        titles = specs.find_all('div', class_='EquipmentDetails-title')
-        values = specs.find_all('div', class_='EquipmentDetails-value')
-        # Strip whitespace from strings and create a dictionary of title : value
-        scrapedSpecs = {title.text.strip() : value.text.strip() for title, value in zip(titles, values)}
-
-        return scrapedSpecs
 
     def __fetchRecallData(self):
         """
