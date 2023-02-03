@@ -26,31 +26,6 @@ class Vehicle():
             self.trim = self.data['Trim']
             self.doors = self.data['Doors']
             self.engine = Engine.Engine(self.data)
-
-            try:
-                conn = db.connect()
-                conn.autocommit = True
-                cur = conn.cursor()
-
-                # Add body type to DB
-                cur.execute(f"""INSERT INTO body (type)
-                            select '{self.body}'
-                            WHERE
-                            NOT EXISTS (SELECT type FROM body WHERE type='{self.body}')""")
-
-                # Add vehicle to DB                
-                cur.execute(f"""INSERT INTO vehicle 
-                            SELECT '{self.vin}', {self.year}, 'Black', {self.make}, {self.model}, (SELECT id FROM body WHERE type='{self.body}'), (SELECT id FROM engine WHERE model='{self.engine.model}')
-                            WHERE
-                            NOT EXISTS (SELECT vin FROM vehicle WHERE vin='{self.vin}')""")
-                
-                ##### PREVENTS SQL INJECTION ATTACKS https://www.psycopg.org/psycopg3/docs/basic/params.html
-                # cur.execute(f"""SELECT (username, password) FROM users WHERE username=%s and password=%s""", (user, paswd))
-                # results = cur.fetchall()
-                # print(results)
-
-            except Exception as e:
-                print("Connection failed: {}".format(e))
         else:
             print("VIN error")
 
@@ -122,7 +97,25 @@ def addVehicle(vin : str):
         print(f"\nVIN must be 17 characters long")
     else:
         print(f"\n{vin} already exists")
+    
+    try:
+        conn = db.connect()
+        cur = conn.cursor()
+        conn.autocommit = True
 
+        newVehicle = Vehicle(vin)
+
+        cur.execute(f"""INSERT INTO body (type)
+                            select '{newVehicle.body}'
+                            WHERE
+                            NOT EXISTS (SELECT type FROM body WHERE type='{newVehicle.body}')""")
+
+        cur.execute(f"""INSERT INTO vehicle 
+                    SELECT '{newVehicle.vin}', {newVehicle.year}, 'Black', {newVehicle.make}, {newVehicle.model}, (SELECT id FROM body WHERE type='{newVehicle.body}'), (SELECT id FROM engine WHERE model='{newVehicle.engine.model}')
+                    WHERE
+                    NOT EXISTS (SELECT vin FROM vehicle WHERE vin='{newVehicle.vin}')""")
+    except Exception as e:
+        print(f"Failed to add vehicle to database: {e}")
 
 def deleteVehicle(vin : str):
     """

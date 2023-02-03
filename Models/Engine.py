@@ -34,10 +34,9 @@ class Engine():
             cur = conn.cursor()
             # Add engine to DB
             cur.execute(f"""INSERT INTO engine (model, horsepower, displacement, cylinders, configuration, drive_type, fuel_type)
-                        SELECT %s, %s, %s, %s, %s, %s, %s
+                        SELECT '{self.model}', {self.horsePower}, {self.displacementL}, {self.cylinders}, '{self.configuration}', '{self.driveType}', '{self.fuelType}'
                         WHERE 
-                        NOT EXISTS (SELECT model FROM engine WHERE model = %s)""", 
-                        (self.model, self.horsePower, self.displacementL, self.cylinders, self.configuration, self.driveType, self.fuelType, self.model))
+                        NOT EXISTS (SELECT model FROM engine WHERE model = '{self.model}')""") 
         except Exception as e:
             print(f"Connection failed due to: {e}")
 
