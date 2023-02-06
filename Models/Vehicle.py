@@ -88,16 +88,6 @@ def addVehicle(vin : str):
 
     :param vin: VIN of the vehicle to be added
     """
-    if len(vin) == 17 and findVehicle(vin) == -1:
-        newVehicle = Vehicle(vin)
-        vehicleIndex.append(newVehicle)
-
-        print(f"\nAdded {newVehicle}")
-    elif len(vin) != 17:
-        print(f"\nVIN must be 17 characters long")
-    else:
-        print(f"\n{vin} already exists")
-    
     try:
         conn = db.connect()
         cur = conn.cursor()
@@ -109,13 +99,16 @@ def addVehicle(vin : str):
                             select '{newVehicle.body}'
                             WHERE
                             NOT EXISTS (SELECT type FROM body WHERE type='{newVehicle.body}')""")
+        print(f"Body {newVehicle.body}: {cur.statusmessage}")
 
         cur.execute(f"""INSERT INTO vehicle 
-                    SELECT '{newVehicle.vin}', {newVehicle.year}, 'Black', {newVehicle.make}, {newVehicle.model}, (SELECT id FROM body WHERE type='{newVehicle.body}'), (SELECT id FROM engine WHERE model='{newVehicle.engine.model}')
+                    SELECT '{newVehicle.vin}', {newVehicle.year}, {newVehicle.make}, {newVehicle.model}, (SELECT id FROM body WHERE type='{newVehicle.body}'), (SELECT id FROM engine WHERE model='{newVehicle.engine.model}')
                     WHERE
                     NOT EXISTS (SELECT vin FROM vehicle WHERE vin='{newVehicle.vin}')""")
+        print(f"Vehicle {newVehicle.vin}: {cur.statusmessage}")
+
     except Exception as e:
-        print(f"Failed to add vehicle to database: {e}")
+        print(f"Failed to connect to database: {e}")
 
 def deleteVehicle(vin : str):
     """

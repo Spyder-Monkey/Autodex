@@ -36,7 +36,8 @@ class Engine():
             cur.execute(f"""INSERT INTO engine (model, horsepower, displacement, cylinders, configuration, drive_type, fuel_type)
                         SELECT '{self.model}', {self.horsePower}, {self.displacementL}, {self.cylinders}, '{self.configuration}', '{self.driveType}', '{self.fuelType}'
                         WHERE 
-                        NOT EXISTS (SELECT model FROM engine WHERE model = '{self.model}')""") 
+                        NOT EXISTS (SELECT model FROM engine WHERE model = '{self.model}')""")
+            print(f"Engine {self.model}: {cur.statusmessage}")
         except Exception as e:
             print(f"Connection failed due to: {e}")
 
