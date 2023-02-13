@@ -83,6 +83,25 @@ def listEngine(vin : str):
     except Exception as e:
         print(f"Failed to connect: {e}")
 
+def listEngines():
+    try:
+        conn = db.connect()
+        cur = conn.cursor()
+
+        cur.execute(f"""SELECT model, horsepower, displacement, cylinders, configuration, drive_type FROM engine""")
+        results = cur.fetchall()
+
+        table = PrettyTable()
+        table.title = "ENGINES"
+        table.set_style(SINGLE_BORDER)
+        table.field_names = ["Model", "Horsepower", "Displacement (L)", "Cylinders", "Config", "Drive"]
+
+        for result in results:
+            table.add_row([result[0], result[1], result[2], result[3], result[4], result[5]])
+        print(table)
+    except Exception as e:
+        print(f"Failed to connect due to: {e}")
+
 def listMakes():
     try:
         conn = db.connect()

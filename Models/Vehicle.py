@@ -6,7 +6,6 @@ Description : Model of Vehicle objects and their associated methods
 from typing import List
 import json
 import requests
-from bs4 import BeautifulSoup
 
 import Models.Engine as Engine
 import Models.Recall as Recall

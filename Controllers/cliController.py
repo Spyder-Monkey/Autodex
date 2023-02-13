@@ -98,6 +98,12 @@ class cliController(cmd2.Cmd):
         """
         Interface.listEngine(arg.vin)
 
+    def do_listEngines(self, _):
+        """
+        List all engines
+        """
+        Interface.listEngines()
+
     def do_listMakes(self, _):
         """
         List all makes stored in database
