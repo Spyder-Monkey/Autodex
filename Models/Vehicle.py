@@ -10,6 +10,7 @@ import requests
 import Models.Engine as Engine
 import Models.Recall as Recall
 import database as db
+from fileLogging import logger
 
 class Vehicle():
     def __init__(self, vin:str):
@@ -26,6 +27,7 @@ class Vehicle():
             self.doors = self.data['Doors']
             self.engine = Engine.Engine(self.data)
         else:
+            logger().error(f'Invalid VIN:{self.vin}')
             print("VIN error")
 
     def __repr__(self) -> str:
@@ -98,15 +100,17 @@ def addVehicle(vin : str):
                             select '{newVehicle.body}'
                             WHERE
                             NOT EXISTS (SELECT type FROM body WHERE type='{newVehicle.body}')""")
-        print(f"Body {newVehicle.body}: {cur.statusmessage}")
+        logger().info(f'Body:{cur.statusmessage}')
 
         cur.execute(f"""INSERT INTO vehicle 
                     SELECT '{newVehicle.vin}', {newVehicle.year}, {newVehicle.make}, {newVehicle.model}, (SELECT id FROM body WHERE type='{newVehicle.body}'), (SELECT id FROM engine WHERE model='{newVehicle.engine.model}')
                     WHERE
                     NOT EXISTS (SELECT vin FROM vehicle WHERE vin='{newVehicle.vin}')""")
-        print(f"Vehicle {newVehicle.vin}: {cur.statusmessage}")
+        logger().info(f'[{vin}]:{cur.statusmessage}')
+        print(f"\nAdded vehicle [{vin}]")
 
     except Exception as e:
+        logger().exception('')
         print(f"Failed to connect to database: {e}")
 
 def deleteVehicle(vin : str):

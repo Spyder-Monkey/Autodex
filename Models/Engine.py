@@ -3,6 +3,7 @@ Filename    : Engine.py
 Description :
 """
 
+from fileLogging import logger
 import database as db
 class Engine():
 
@@ -24,9 +25,11 @@ class Engine():
                         SELECT '{self.model}', {self.horsePower}, {self.displacementL}, {self.cylinders}, '{self.configuration}', '{self.driveType}', '{self.fuelType}'
                         WHERE 
                         NOT EXISTS (SELECT model FROM engine WHERE model = '{self.model}')""")
-            print(f"Engine {self.model}: {cur.statusmessage}")
+            # print(f"Engine {self.model}: {cur.statusmessage}")
+            logger().info(f'[{self.model}]:{cur.statusmessage}')
         except Exception as e:
-            print(f"Connection failed due to: {e}")
+            logger().exception('')
+            print(f"Could not connect to the database")
 
     def __repr__(self) -> str:
         return f"{self.model}"

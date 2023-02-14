@@ -53,10 +53,6 @@ class cliController(cmd2.Cmd):
         if len(arg.vin) != 17:
             print("VIN should be 17 characters long")
             return
-
-        # if arg.miles:
-        #     Vehicle.addVehicle(arg.vin, arg.miles)
-        # else:
         
         Vehicle.addVehicle(arg.vin)
 
