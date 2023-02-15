@@ -7,7 +7,6 @@ import pyfiglet
 import sys
 import cmd2
 from pick import pick
-import psycopg2
 import boto3
 import os
 from dotenv import load_dotenv
@@ -15,6 +14,7 @@ from dotenv import load_dotenv
 # Local Imports
 import Models.Vehicle as Vehicle
 import Models.Interface as Interface
+from fileLogging import logger
 
 _intro_text = """\
 {}
@@ -33,14 +33,13 @@ DBNAME = os.getenv('DBNAME')
 session = boto3.Session(profile_name="default")
 client = session.client('rds')
 
-
-
 class cliController(cmd2.Cmd):
     intro = _intro_text.format(pyfiglet.figlet_format("AutoDex"))
     prompt = ">> "
 
     def __init__(self):
         super().__init__(allow_cli_args=False)
+        logger().info('Program Startup')
 
     addVehicleParser = cmd2.Cmd2ArgumentParser(description="Add a new vehicle")
     addVehicleParser.add_argument('vin', help="Vehicle Identification Number (17 characters)")
@@ -55,21 +54,6 @@ class cliController(cmd2.Cmd):
             return
         
         Vehicle.addVehicle(arg.vin)
-
-    def do_editVehicle(self, _):
-        """
-        Change a value of a vehicle object
-        """
-        vehicleOption, _ = pick(Vehicle.vehicleIndex, "Select a vehicle to edit:", indicator=">> ")
-        editOption, _ = pick(['Miles', 'Color'], "What would you like to change?", indicator=">> ")
-        Vehicle.editVehicle(vehicleOption, editOption)
-
-    def do_deleteVehicle(self, _):
-        """
-        Remove a vehicle object
-        """
-        option, _ = pick(Vehicle.vehicleIndex, "Select a vehicle to delete:", indicator=">> ")
-        Vehicle.deleteVehicle(option)
 
     def do_listVehicles(self, _):
         """
@@ -124,5 +108,6 @@ class cliController(cmd2.Cmd):
         """
         Exit the program
         """
+        logger().info("Exit Program")
         sys.exit()
 

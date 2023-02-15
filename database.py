@@ -1,6 +1,7 @@
 import os
 import psycopg2
 import boto3
+from fileLogging import logger
 
 from dotenv import load_dotenv
 
@@ -17,6 +18,7 @@ session = boto3.Session(profile_name="default")
 client = session.client('rds')
 
 def connect():
+    logger().info('Connected to database')
     return psycopg2.connect(
         host = ENDPOINT,
         port = PORT,

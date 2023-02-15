@@ -25,7 +25,6 @@ class Engine():
                         SELECT '{self.model}', {self.horsePower}, {self.displacementL}, {self.cylinders}, '{self.configuration}', '{self.driveType}', '{self.fuelType}'
                         WHERE 
                         NOT EXISTS (SELECT model FROM engine WHERE model = '{self.model}')""")
-            # print(f"Engine {self.model}: {cur.statusmessage}")
             logger().info(f'[{self.model}]:{cur.statusmessage}')
         except Exception as e:
             logger().exception('')

@@ -3,7 +3,6 @@ Filename    : Vehicle.py
 Description : Model of Vehicle objects and their associated methods
 """
 
-from typing import List
 import json
 import requests
 
@@ -71,18 +70,6 @@ class Vehicle():
 
         return recallList
 
-def findVehicle(vin : str):
-    """
-        Searches vehicleIndex for the vin.
-
-        :param vin: VIN to be searched for in vehicleIndex
-        :returns: The index of the vehicle in vehicleIndex, otherwise -1
-    """
-    for i, v in enumerate(vehicleIndex):
-        if v.vin == vin:
-            return i
-    return -1
-
 def addVehicle(vin : str):
     """
     Adds a new vehicle to vehicleIndex if the vin does not already exist
@@ -112,34 +99,5 @@ def addVehicle(vin : str):
     except Exception as e:
         logger().exception('')
         print(f"Failed to connect to database: {e}")
-
-def deleteVehicle(vin : str):
-    """
-    Removes the vehicle with vin from vehicleIndex if it exists
-
-    :param vin: VIN of the target vehicle
-    """
-    index = findVehicle(vin)
-    if index > -1:
-        vehicleIndex.pop(index)
-    else:
-        print(f'\n{vin} does not exist')
-
-def editVehicle(vehicle : Vehicle, editOption : str):
-    """
-    Changes the value of a vehicle
-
-    :param vehicle: The target vehicle
-    :param editOption: What aspect to change
-    """
-
-    if editOption == 'Miles':
-        vehicle.miles = input("(New miles)>> ")
-    elif editOption == 'Color':
-        vehicle.color = input("(New color)>> ")
-
-#####################################################################################
-
-vehicleIndex : List[Vehicle] = []
 
 
