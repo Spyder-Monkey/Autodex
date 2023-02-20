@@ -40,6 +40,13 @@ class cliController(cmd2.Cmd):
     def __init__(self):
         super().__init__(allow_cli_args=False)
         logger().info('Program Startup')
+        del cmd2.Cmd.do_edit
+        del cmd2.Cmd.do_history
+        del cmd2.Cmd.do_macro
+        del cmd2.Cmd.do_set
+        del cmd2.Cmd.do_shell
+        del cmd2.Cmd.do_shortcuts
+        logger().info('Removed builtin commands')
 
     addVehicleParser = cmd2.Cmd2ArgumentParser(description="Add a new vehicle")
     addVehicleParser.add_argument('vin', help="Vehicle Identification Number (17 characters)")
@@ -50,6 +57,7 @@ class cliController(cmd2.Cmd):
         Add a vehicle object
         """
         if len(arg.vin) != 17:
+            logger().error('VIN should be 17 characters long')
             print("VIN should be 17 characters long")
             return
         
@@ -94,6 +102,9 @@ class cliController(cmd2.Cmd):
     listModelsParser.add_argument('make', help="Make to list all models of")
     @cmd2.with_argparser(listModelsParser)
     def do_listModels(self, arg):
+        """
+        List all models from the specified make
+        """
         Interface.listModels(arg.make)
 
     def do_listRecall(self, _):
@@ -103,7 +114,6 @@ class cliController(cmd2.Cmd):
         option, _ = pick(Vehicle.vehicleIndex, "Select a vehicle:", indicator=">> ")
         Interface.listRecalls(option)
     
-
     def do_exit(self, _):
         """
         Exit the program

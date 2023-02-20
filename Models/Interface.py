@@ -6,6 +6,7 @@ Description : Functions for commands involving the interface
 import Models.Vehicle as Vehicle
 import database as db
 from prettytable import PrettyTable, SINGLE_BORDER
+from beautifultable import BeautifulTable
 from fileLogging import logger
 
 def listVehicles():
@@ -22,14 +23,14 @@ def listVehicles():
         
         results = cur.fetchall()
         # Create table for output
-        table = PrettyTable()
-        table.set_style(SINGLE_BORDER)
-        table.field_names = ["VIN", "Year", "Make", "Model", "Body", "Engine Model", "Horsepower"]
-        # Add the rows to the table
-        for row in results:
-            table.add_row([row[0], row[1], row[3], row[2], row[4], row[5], row[6]])
+        tab = BeautifulTable(maxwidth=150)
+        tab.set_style(BeautifulTable.STYLE_BOX)
+        tab.columns.header = ["VIN", "Year", "Make", "Model", "Body", "Engine Model", "Horsepower"]
 
-        print(table)
+        for row in results:
+            tab.rows.append([row[0], row[1], row[3], row[2], row[4], row[5], row[6]])
+
+        print(tab)
         logger().info(f'{cur.statusmessage}')
     except Exception as e:
         logger().exception('')
@@ -61,9 +62,8 @@ def listVehicle(vin : str):
         table.set_style(SINGLE_BORDER)
         table.field_names = ["Make", "Model", "Year", "Body", "Engine", "Horsepower"]
         table.add_row([results[3], results[2], results[1], results[4], results[5], results[6]])
-        print(table)
-
         
+        print(table)
     except Exception as e:
         logger().exception('')
         print("Could not connect to the database")

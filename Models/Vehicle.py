@@ -70,7 +70,7 @@ class Vehicle():
 
         return recallList
 
-def addVehicle(vin : str):
+def addVehicle(vin: str):
     """
     Adds a new vehicle to vehicleIndex if the vin does not already exist
 
@@ -99,5 +99,13 @@ def addVehicle(vin : str):
     except Exception as e:
         logger().exception('')
         print(f"Failed to connect to database: {e}")
+
+
+    """
+        * VIN already exists
+        * VIN is too short
+        * VIN is too long
+        * VIN is invalid
+    """
 
 
