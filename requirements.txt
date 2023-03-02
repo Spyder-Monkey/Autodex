@@ -10,3 +10,4 @@ gnureadline
 pyreadline3
 bs4
 python-dotenv
+ttkthemes
