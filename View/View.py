@@ -18,28 +18,34 @@ class View(ctk.CTk):
         ctk.set_default_color_theme('blue')
 
         self.rowconfigure(0, weight=1)
-        self.rowconfigure(1, weight=1)
+        self.rowconfigure(1, weight=2)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=2)
-
-        # self.frame = MainFrame(self)
+        # FRAMES
         self.inputFrame = ctk.CTkFrame(self)
+        # self.inputFrame.pack(anchor=ctk.W)
+        self.garageFrame = ctk.CTkFrame(self)
+        # self.garageFrame.pack(anchor=ctk.NE, ipadx=10, ipady=10)
+        self.outputFrame = ctk.CTkFrame(self)
+        # self.outputFrame.pack(anchor=ctk.S)
+        # LABELS
+        self.label = ctk.CTkLabel(master=self.inputFrame, text="AUTODEX")
+        # self.label.pack()
+        self.garageLabel = ctk.CTkLabel(master=self.garageFrame, text="GARAGE", justify=ctk.LEFT)
+        # self.garageLabel.pack()
+        self.outputLabel = ctk.CTkLabel(master=self.outputFrame, text="OUTPUT", justify=ctk.LEFT)
+        # self.outputLabel.pack()
+        
+        self.emptyLabel = ctk.CTkLabel(master=self.inputFrame)
 
-        self.label = ctk.CTkLabel(master=self.inputFrame, text="AUTODEX", justify=ctk.LEFT)
-
-        self.progress = ctk.CTkProgressBar(master=self.inputFrame)
+        self.tabs = self.tabView()
+        # self.tabs.enable_traversal()
+        # self.tabs.pack()
 
         # Set frame dimensions to the screen dimensions
         screenWidth = self.winfo_screenwidth()
         screenHeight = self.winfo_screenheight()
         self.geometry(f"{screenWidth}x{screenHeight}")
-
-        self.outputFrame = ctk.CTkFrame(self)
-        self.outputLabel = ctk.CTkLabel(master=self.outputFrame, text="OUTPUT", justify=ctk.LEFT)
-
-        self.switch = ctk.CTkSwitch(master=self.outputFrame)
-
-        # self.style = self.widgetStyles()
 
         self.widgetGrid()
 
@@ -51,50 +57,26 @@ class View(ctk.CTk):
         
         self.inputFrame.grid(row=0, column=0, sticky='nsew', rowspan=2, columnspan=1)
         self.inputFrame.rowconfigure(0, weight=1)
+        # self.inputFrame.rowconfigure(1, weight=2)
+        # self.inputFrame.columnconfigure(0, weight=2)
         self.inputFrame.columnconfigure(1, weight=1)
 
-        self.outputFrame.grid(row=0, column=1, sticky='nsew', rowspan=2, columnspan=3)
+        self.garageFrame.grid(row=0, column=1, sticky='nsew', rowspan=1, columnspan=3)
 
-        self.progress.grid(row=0, column=1)
-        self.label.grid(row=0, column=0, sticky='nw')
+        self.outputFrame.grid(row=1, column=1, sticky='nsew', rowspan=1, columnspan=3)
 
+        # self.label.grid(row=0, column=0, sticky='n')
+        self.garageLabel.grid(row=0, column=0, sticky='w')
         self.outputLabel.grid(row=0, column=0, sticky='w')
-        self.switch.grid(row=0, column=1)
 
-    def widgetStyles(self) -> ttk.Style:
-        theme = ttk.Style(self)
-        # FRAME
-        theme.configure('TFrame', background='#FAFAFA')
-        # NOTEBOOK
-        theme.configure('TNotebook', background='#686963')
-        # BUTTON
-        theme.configure('TButton', background='#904E55', foreground='#FAFAFA')
-        theme.map('TButton', background=[('active', '#DB5461')])
-        # LABEL
-        theme.configure('TLabel', background='#FAFAFA', foreground='#686963')
-        return theme
+        self.tabs.grid(row=0, column=0, sticky='nsew', rowspan=2, columnspan=2)
 
-    """
-    File menu
-    """
-    def createMenu(self):
-        menubar = tk.Menu(self, background='#564E58', foreground="#E3F2FD")
-        # File Menu
-        fileMenu = tk.Menu(menubar, tearoff=0)
-        fileMenu.add_command(label="Open", command=None)
-        fileMenu.add_command(label="Print", command=None)
-        fileMenu.add_separator()
-        fileMenu.add_command(label="Exit", command=self.quit)
-        menubar.add_cascade(label="File", menu=fileMenu)
-        # Edit Menu
-        editMenu = tk.Menu(menubar, tearoff=0)
-        editMenu.add_command(label="Undo", command=None)
-        editMenu.add_command(label="Redo", command=None)
-        editMenu.add_separator()
-        editMenu.add_command(label="Find", command=None)
-        menubar.add_cascade(label="Edit", menu=editMenu)
-        # Help Menu
+    def tabView(self):
+        tab = ctk.CTkTabview(master=self.inputFrame)
+        tab.add("Garage")
+        tab.add("Search")
+        tab.add("Add")
 
-        self.config(menu=menubar)
+        return tab
 
 
