@@ -45,14 +45,14 @@ class View(tk.Tk):
     def widgetStyles(self) -> ttk.Style:
         theme = ttk.Style(self)
         # FRAME
-        theme.configure('TFrame', background='#686963')
+        theme.configure('TFrame', background='#FAFAFA')
         # NOTEBOOK
         theme.configure('TNotebook', background='#686963')
         # BUTTON
-        theme.configure('TButton', background='#DB5461', foreground='#FAFAFA')
-        theme.map('TButton', background=[('active', '#904E55')])
+        theme.configure('TButton', background='#904E55', foreground='#FAFAFA')
+        theme.map('TButton', background=[('active', '#DB5461')])
         # LABEL
-        theme.configure('TLabel', background='#686963', foreground='#FAFAFA')
+        theme.configure('TLabel', background='#FAFAFA', foreground='#686963')
         return theme
 
     """
