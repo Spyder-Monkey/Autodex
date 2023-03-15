@@ -4,7 +4,6 @@ Description :
 """
 
 # Local imports
-import database as db
 from View.View import View
 
 class Controller:
