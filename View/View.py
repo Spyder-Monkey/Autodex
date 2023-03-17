@@ -1,89 +1,54 @@
 """
 Filename    : View.py
-Description :
+Description : Main container file for the GUI view
 """
-import tkinter as tk
-from tkinter import ttk
+# Local imports
+from fileLogging import logger
+# View imports
+import View.SideBarFrame as SideBarFrame
 
-# from MainFrame import MainFrame
-from View.MainFrame import MainFrame
-class View(tk.Tk):
+import customtkinter as ctk
+class View(ctk.CTk):
 
     def __init__(self, controller):
+        logger().info(f"Starting GUI")
         super().__init__()
         self.controller = controller
         self.title('Autodex')
+        ctk.set_appearance_mode('dark')
+        ctk.set_default_color_theme('green')
 
-        self.rowconfigure(0, weight=1)
-        self.rowconfigure(1, weight=1)
-        self.columnconfigure(1, weight=1)
+        logger().info(f"Appearance: {ctk.get_appearance_mode()}")
+        # Creates a 4x4 grid layout
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure((2,3), weight=0)
+        self.grid_rowconfigure((0, 1, 2), weight=1)
 
-        self.frame = MainFrame(self)
+        # Left side bar frame
+        self.sideBar = SideBarFrame.SideBarFrame(self)
+        # Holds the toggle switch value for light/dark mode
+        self.appearance = ctk.StringVar(value=ctk.get_appearance_mode())
+        # Light/Dark mode toggle switch
+        self.appearanceSwitch = ctk.CTkSwitch(self, text="Appearance", variable=self.appearance, onvalue="Dark", offvalue="Light", command=self.toggleAppearance)
+        self.appearanceSwitch.grid(row=0, column=1, sticky='n')
+
         # Set frame dimensions to the screen dimensions
         screenWidth = self.winfo_screenwidth()
         screenHeight = self.winfo_screenheight()
         self.geometry(f"{screenWidth}x{screenHeight}")
+        logger().info(f"Frame Width: {screenWidth}")
+        logger().info(f"Frame Height: {screenHeight}")
 
-        self.style = self.widgetStyles()
-        # self.style.configure('TNotebook', background='gray')
-        self.createMenu()
-        self.notebook = self.createNotebook()
+        logger().info(f"Successfully started GUI")
 
-        self.widgetGrid()
+    def toggleAppearance(self):
+        """
+        Used to change the appearance of the program
+        """
+        ctk.set_appearance_mode(self.appearance.get())
+        logger().info(f"Appearance changed to {self.appearance.get()}")
 
     def main(self):
         self.mainloop()
-    
-    def widgetGrid(self):
-        sticky = {"sticky":"nswe"}
-        
-        self.frame.grid(row=0, column=0, sticky='nsew', rowspan=2, columnspan=2)
-        self.frame.rowconfigure(0, weight=1)
-        self.frame.columnconfigure(1, weight=1)
-        # self.notebook.grid(row=0, column=1, columnspan=2, **sticky)
-
-    def widgetStyles(self) -> ttk.Style:
-        theme = ttk.Style(self)
-        # FRAME
-        theme.configure('TFrame', background='#FAFAFA')
-        # NOTEBOOK
-        theme.configure('TNotebook', background='#686963')
-        # BUTTON
-        theme.configure('TButton', background='#904E55', foreground='#FAFAFA')
-        theme.map('TButton', background=[('active', '#DB5461')])
-        # LABEL
-        theme.configure('TLabel', background='#FAFAFA', foreground='#686963')
-        return theme
-
-    """
-    File menu
-    """
-    def createMenu(self):
-        menubar = tk.Menu(self, background='#564E58', foreground="#E3F2FD")
-        # File Menu
-        fileMenu = tk.Menu(menubar, tearoff=0)
-        fileMenu.add_command(label="Open", command=None)
-        fileMenu.add_command(label="Print", command=None)
-        fileMenu.add_separator()
-        fileMenu.add_command(label="Exit", command=self.quit)
-        menubar.add_cascade(label="File", menu=fileMenu)
-        # Edit Menu
-        editMenu = tk.Menu(menubar, tearoff=0)
-        editMenu.add_command(label="Undo", command=None)
-        editMenu.add_command(label="Redo", command=None)
-        editMenu.add_separator()
-        editMenu.add_command(label="Find", command=None)
-        menubar.add_cascade(label="Edit", menu=editMenu)
-        # Help Menu
-
-        self.config(menu=menubar)
-
-    def createNotebook(self):
-        notebook = ttk.Notebook(self, style='TNotebook')
-        notebook.add(ttk.Button(self, text="Hello"), text="frame one")
-        notebook.add(ttk.Button(self, text="world"), text="frame two")
-
-
-        return notebook
 
 
