@@ -9,9 +9,9 @@ from fileLogging import logger
 
 class SideBarFrame(ctk.CTkFrame):
     def __init__(self, master):
-        super().__init__(master, width=350, corner_radius=0)
+        super().__init__(master, width=350, corner_radius=5)
         logger().info(f"Creating side bar frame")
-        self.grid(row=0, column=0, rowspan=4, sticky='nsew')
+        self.grid(row=0, column=0, rowspan=4, padx=(10, 5), pady=10, sticky='nsew')
 
         self.grid_rowconfigure(5, weight=2)
         logger().info(f"Adding button icons")
