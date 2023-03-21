@@ -7,6 +7,7 @@ from fileLogging import logger
 # View imports
 import View.SideBarFrame as SideBarFrame
 import View.GarageFrame as GarageFrame
+import View.SettingsFrame as SettingsFrame
 
 import customtkinter as ctk
 class View(ctk.CTk):
@@ -28,13 +29,9 @@ class View(ctk.CTk):
 
         # Left side bar frame
         self.sideBar = SideBarFrame.SideBarFrame(self)
-        self.garage = GarageFrame.GarageFrame(self)
-
-        # Holds the toggle switch value for light/dark mode
-        self.appearance = ctk.StringVar(value=ctk.get_appearance_mode())
-        # Light/Dark mode toggle switch
-        self.appearanceSwitch = ctk.CTkSwitch(self, text="Appearance", variable=self.appearance, onvalue="Dark", offvalue="Light", command=self.toggleAppearance)
-        self.appearanceSwitch.grid(row=0, column=1, sticky='n')
+        self._frame = None
+        self.switchFrame(SettingsFrame.SettingsFrame)
+        # self.switchFrame(GarageFrame.GarageFrame)
 
         # Set frame dimensions to the screen dimensions
         screenWidth = self.winfo_screenwidth()
@@ -51,6 +48,18 @@ class View(ctk.CTk):
         """
         ctk.set_appearance_mode(self.appearance.get())
         logger().info(f"Appearance changed to {self.appearance.get()}")
+
+    def switchFrame(self, frameClass):
+        """
+        Destroys the current frame and replaces it with the new desired framed
+
+        :param newFrame: Frame to be added to the view
+        """
+        newFrame = frameClass(self)
+        if self._frame is not None:
+            self._frame.destroy()
+        self._frame = newFrame
+        self._frame.grid(row=0, column=1, columnspan=2, rowspan=4, padx=(5, 10), pady=10, sticky='nsew')
 
     def main(self):
         self.mainloop()
