@@ -27,11 +27,9 @@ class View(ctk.CTk):
         self.grid_columnconfigure((2,3), weight=0)
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
+        self._frame: ctk.CTkFrame = None
         # Left side bar frame
-        self.sideBar = SideBarFrame.SideBarFrame(self)
-        self._frame = None
-        self.switchFrame(SettingsFrame.SettingsFrame)
-        # self.switchFrame(GarageFrame.GarageFrame)
+        self.sideBar = SideBarFrame.SideBarFrame(self, self.controller)
 
         # Set frame dimensions to the screen dimensions
         screenWidth = self.winfo_screenwidth()
@@ -41,6 +39,16 @@ class View(ctk.CTk):
         logger().info(f"Frame Height: {screenHeight}")
 
         logger().info(f"Successfully started GUI")
+
+        # self.sideBar.settingsButton.configure(command=self.clearFrame)
+
+
+    def clearFrame(self):
+        logger().info("Frame Cleared")
+        for widget in self._frame.winfo_children():
+            widget.destroy()
+
+        # self._frame.grid_forget()
 
     def toggleAppearance(self):
         """
@@ -53,8 +61,9 @@ class View(ctk.CTk):
         """
         Destroys the current frame and replaces it with the new desired framed
 
-        :param newFrame: Frame to be added to the view
+        :param frameClass: Frame to be added to the view
         """
+        logger().info("Frame Switched")
         newFrame = frameClass(self)
         if self._frame is not None:
             self._frame.destroy()
