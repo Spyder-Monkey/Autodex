@@ -4,9 +4,8 @@ Description :
 """
 # Local imports
 from fileLogging import logger
-
 import View.VehicleTile as VehicleTile
-
+# Imports
 import customtkinter as ctk
 
 
@@ -15,9 +14,7 @@ class GarageFrame(ctk.CTkFrame):
 
     def __init__(self, master):
         super().__init__(master, corner_radius=5)
-        self.grid(row=0, column=1, columnspan=2, rowspan=4, padx=(5, 10), pady=10, sticky='nsew')
         self.grid_columnconfigure((0,1,2,3), weight=1)
-        # self.grid_columnconfigure((2,3), weight=0)
         self.grid_rowconfigure((0,1), weight=1)
         logger().info("Main View: Garage")
 

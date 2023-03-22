@@ -6,8 +6,8 @@ Description : Main container file for the GUI view
 from fileLogging import logger
 # View imports
 import View.SideBarFrame as SideBarFrame
-import View.GarageFrame as GarageFrame
-import View.SettingsFrame as SettingsFrame
+# import View.GarageFrame as GarageFrame
+# import View.SettingsFrame as SettingsFrame
 
 import customtkinter as ctk
 class View(ctk.CTk):
@@ -40,35 +40,12 @@ class View(ctk.CTk):
 
         logger().info(f"Successfully started GUI")
 
-        # self.sideBar.settingsButton.configure(command=self.clearFrame)
-
-
-    def clearFrame(self):
-        logger().info("Frame Cleared")
-        for widget in self._frame.winfo_children():
-            widget.destroy()
-
-        # self._frame.grid_forget()
-
     def toggleAppearance(self):
         """
         Used to change the appearance of the program
         """
         ctk.set_appearance_mode(self.appearance.get())
         logger().info(f"Appearance changed to {self.appearance.get()}")
-
-    def switchFrame(self, frameClass):
-        """
-        Destroys the current frame and replaces it with the new desired framed
-
-        :param frameClass: Frame to be added to the view
-        """
-        logger().info("Frame Switched")
-        newFrame = frameClass(self)
-        if self._frame is not None:
-            self._frame.destroy()
-        self._frame = newFrame
-        self._frame.grid(row=0, column=1, columnspan=2, rowspan=4, padx=(5, 10), pady=10, sticky='nsew')
 
     def main(self):
         self.mainloop()
