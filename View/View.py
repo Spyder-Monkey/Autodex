@@ -6,6 +6,8 @@ Description : Main container file for the GUI view
 from fileLogging import logger
 # View imports
 import View.SideBarFrame as SideBarFrame
+# import View.GarageFrame as GarageFrame
+# import View.SettingsFrame as SettingsFrame
 
 import customtkinter as ctk
 class View(ctk.CTk):
@@ -20,17 +22,14 @@ class View(ctk.CTk):
 
         logger().info(f"Appearance: {ctk.get_appearance_mode()}")
         # Creates a 4x4 grid layout
-        self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(1, weight=4)
+        self.grid_columnconfigure(4, weight=1)
         self.grid_columnconfigure((2,3), weight=0)
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
+        self._frame: ctk.CTkFrame = None
         # Left side bar frame
-        self.sideBar = SideBarFrame.SideBarFrame(self)
-        # Holds the toggle switch value for light/dark mode
-        self.appearance = ctk.StringVar(value=ctk.get_appearance_mode())
-        # Light/Dark mode toggle switch
-        self.appearanceSwitch = ctk.CTkSwitch(self, text="Appearance", variable=self.appearance, onvalue="Dark", offvalue="Light", command=self.toggleAppearance)
-        self.appearanceSwitch.grid(row=0, column=1, sticky='n')
+        self.sideBar = SideBarFrame.SideBarFrame(self, self.controller)
 
         # Set frame dimensions to the screen dimensions
         screenWidth = self.winfo_screenwidth()
