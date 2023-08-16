@@ -8,8 +8,6 @@ import View.VehicleTile as VehicleTile
 # Imports
 import customtkinter as ctk
 
-
-
 class GarageFrame(ctk.CTkFrame):
 
     def __init__(self, master):

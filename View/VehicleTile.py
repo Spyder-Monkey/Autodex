@@ -3,6 +3,27 @@ Filename    : VehicleTile.py
 Description : Class for creating a tile for a vehicle object
 """
 
+
+"""
+
+    * inspection time
+    * tire rotation
+    * oil changes
+    * registration expires
+
+"""
+
+
+
+
+
+
+
+
+
+
+
+
 # Local imports
 from fileLogging import logger
 # Imports

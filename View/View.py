@@ -6,8 +6,6 @@ Description : Main container file for the GUI view
 from fileLogging import logger
 # View imports
 import View.SideBarFrame as SideBarFrame
-# import View.GarageFrame as GarageFrame
-# import View.SettingsFrame as SettingsFrame
 
 import customtkinter as ctk
 class View(ctk.CTk):

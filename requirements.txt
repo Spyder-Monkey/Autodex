@@ -11,3 +11,5 @@ pyreadline3
 bs4
 python-dotenv
 customtkinter
+pillow
+beautifultable
